@@ -9,5 +9,14 @@
 
   <body>
     <h1><%= kindOfDay %></h1>
+    <form action="/" method="post">
+      <input type="text" name="newItem">
+      <button type="submit" name="button">Add</button>
+    </form>
+    <ul>
+      <% newListItems.forEach(item => { %>
+        <li><%= item %></li>
+      <% })  %>
+    </ul>
   </body>
 </html>
