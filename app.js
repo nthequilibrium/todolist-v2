@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const date = require(__dirname + "/date.js");
 
 let items = ["Buy Food", "Cook Food", "Eat Food"];
 let workItems = [];
@@ -11,15 +12,7 @@ app.use(express.static("public"));
 app.set("view engine", "ejs"); // setting express view engine to use ejs
 
 app.get("/", (req, res) => {
-    let today = new Date();
-    let options = {
-        weekday: "long",
-        day: "numeric",
-        month: "long"
-    };
-
-    let day = today.toLocaleDateString("EN-IN", options);
-
+    let day = date();
     res.render("list", { listTitle: day, newListItems: items });
 });
 
