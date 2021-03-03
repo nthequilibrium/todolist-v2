@@ -15,6 +15,23 @@ app.set("view engine", "ejs"); // setting express view engine to use ejs
 // setting up database
 mongoose.connect("mongodb://localhost:27017/todolistDB", {useNewUrlParser: true, useUnifiedTopology: true});
 
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'Error connecting to database'));
+db.once('open', () => {
+    console.log("We are connected to mongodb @localhost:27017");
+});
+
+// create schema to for Item
+const itemSchema = {
+    name: {
+        type: String,
+        required: [true, "An item is required to store in ToDo list."]
+    }
+};
+
+// create the model for an Item based on itemSchema.
+const Item = mongoose.model("Item", itemSchema);
+
 app.get("/", (req, res) => {
     let day = date();
     res.render("list", { listTitle: day, newListItems: items });
