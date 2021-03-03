@@ -31,19 +31,49 @@ const itemSchema = {
 // create the model for an Item based on itemSchema.
 const Item = mongoose.model("Item", itemSchema);
 
+// dummy items
+const milk = new Item ({ name: "Buy Milk"});
+const bills = new Item ({ name: "Pay bills"});
+const mail = new Item ({ name: "Collect Mail"});
+
+const dummyItems = [milk, bills, mail];
+
+// insert the items array into database
+
+
 app.get("/", (req, res) => {
-    res.render("list", { listTitle: "Today", newListItems: items });
+    Item.find({}, function (err, items) {
+        if (err) {
+            console.error.bind(console, "Error reading database", err);
+        } else {
+            if (items.length === 0) {
+                Item.insertMany(dummyItems, (err) => {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log("Dummy items inserted into document");
+                    }
+                    items = dummyItems;
+                });
+            }
+            res.render("list", { listTitle: "Today", newListItems: items});
+        }
+    });
 });
 
 app.post("/", (req, res) => {
-    let item = req.body.newItem;
-    if (req.body.button === "Work") {
-        workItems.push(item);
-        res.redirect("/work");
-    } else {
-        items.push(item);
+    const itemName = req.body.newItem;
+    if (itemName === "") {
         res.redirect("/");
     }
+    const item = new Item({ name: itemName});
+    item.save(err => {
+        if (err) {
+            console.error.bind(console, err);
+        } else {
+            res.redirect("/");
+        }
+    });
 });
 
 app.get("/work", (req, res) => {
