@@ -90,6 +90,21 @@ app.get("/about", function (req, res) {
     res.render("about");
 })
 
+app.post("/delete", (req, res) => {
+    const checkedItem = req.body.itemCheck;
+
+    // deleting item document based on item-id
+    Item.findByIdAndDelete(checkedItem, (err, doc) => {
+        // console.log(doc);
+        if (err) {
+            console.log(err);
+            res.redirect("/");
+        } else {
+            res.redirect("/");
+        }
+    });
+});
+
 app.listen(3000, () => {
     console.log("Server is running @ port 3000");
 });
