@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 const mongoose = require('mongoose');
-const date = require(__dirname + "/date.js");
 
 // let items = ["Buy Food", "Cook Food", "Eat Food"];
 // let workItems = [];
@@ -33,8 +32,7 @@ const itemSchema = {
 const Item = mongoose.model("Item", itemSchema);
 
 app.get("/", (req, res) => {
-    let day = date();
-    res.render("list", { listTitle: day, newListItems: items });
+    res.render("list", { listTitle: "Today", newListItems: items });
 });
 
 app.post("/", (req, res) => {
