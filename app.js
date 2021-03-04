@@ -38,8 +38,14 @@ const mail = new Item ({ name: "Collect Mail"});
 
 const dummyItems = [milk, bills, mail];
 
-// insert the items array into database
+const listSchema = {
+    name: String,
+    items: [itemSchema]
+};
 
+const List = mongoose.model("List", listSchema);
+
+// insert the items array into database
 
 app.get("/", (req, res) => {
     Item.find({}, function (err, items) {
@@ -61,23 +67,56 @@ app.get("/", (req, res) => {
     });
 });
 
+app.get("/:customListName", function (req, res) {
+    const customListName = req.params.customListName;
+
+    List.findOne({name: customListName}, function (err, foundList) {
+        if (!err) {
+            if (!foundList) {
+                // Create the list
+                const list = new List({
+                    name: customListName, 
+                    items: dummyItems
+                });
+            
+                list.save();
+                res.redirect("/" + customListName);
+            } else {
+                // Show existing list
+                res.render("list", {listTitle: foundList.name, newListItems: foundList.items});
+            }
+        }
+    })
+
+});
+
+app.get("/favicon.ico", (req, res) => {
+    res.status(204);
+})
+
 app.post("/", (req, res) => {
     const itemName = req.body.newItem;
+    const listName = req.body.list;
     if (itemName === "") {
         res.redirect("/");
     }
     const item = new Item({ name: itemName});
-    item.save(err => {
-        if (err) {
-            console.error.bind(console, err);
-        } else {
-            res.redirect("/");
-        }
-    });
-});
 
-app.get("/work", (req, res) => {
-    res.render("list", {listTitle: "Work List", newListItems: workItems});
+    if (listName === "Today") {
+        item.save(err => {
+            if (err) {
+                console.error.bind(console, err);
+            } else {
+                res.redirect("/");
+            }
+        });
+    } else {
+        List.findOne({name: listName}, (err, foundList) => {
+            foundList.items.push(item);
+            foundList.save();
+            res.redirect("/" + listName);
+        })
+    }
 });
 
 app.post("/work", (req, res) => {
