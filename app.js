@@ -131,17 +131,28 @@ app.get("/about", function (req, res) {
 
 app.post("/delete", (req, res) => {
     const checkedItem = req.body.itemCheck;
+    const listName = req.body.listName;
 
-    // deleting item document based on item-id
-    Item.findByIdAndDelete(checkedItem, (err, doc) => {
-        // console.log(doc);
-        if (err) {
-            console.log(err);
-            res.redirect("/");
-        } else {
-            res.redirect("/");
-        }
-    });
+    if (listName === "Today") {
+
+        // deleting item document based on item-id
+        Item.findByIdAndDelete(checkedItem, (err, doc) => {
+            // console.log(doc);
+            if (err) {
+                console.log(err);
+                res.redirect("/");
+            } else {
+                res.redirect("/");
+            }
+        });
+    } else {
+        List.findOneAndUpdate({name: listName}, {$pull: {items: {_id: checkedItem}}}, (err, foundList) => {
+            if (!err) {
+                res.redirect("/" + listName);
+            }
+        });
+    }
+
 });
 
 app.listen(3000, () => {
